@@ -9,7 +9,7 @@ app.use(express.json());
 
 mongoose
   .connect(
-    "mongodb://nikhileashy9_db_user:L2uTDMp9AhTjICyz@ac-vxxbpg8-shard-00-00.lbmml1l.mongodb.net:27017,ac-vxxbpg8-shard-00-01.lbmml1l.mongodb.net:27017,ac-vxxbpg8-shard-00-02.lbmml1l.mongodb.net:27017/?ssl=true&replicaSet=atlas-ouhjvf-shard-0&authSource=admin&appName=Cluster0"
+    "mongodb://nikhileashy9_db_user:L2uTDMp9AhTjICyz@ac-vxxbpg8-shard-00-00.lbmml1l.mongodb.net:27017,ac-vxxbpg8-shard-00-01.lbmml1l.mongodb.net:27017,ac-vxxbpg8-shard-00-02.lbmml1l.mongodb.net:27017/?ssl=true&replicaSet=atlas-ouhjvf-shard-0&authSource=admin&appName=Cluster0",
   )
   .then(() => {
     console.log("MongoDB Connected Successfully");
@@ -18,64 +18,115 @@ mongoose
     console.error("MongoDB Connection Error:", err);
   });
 
-const UserSchema = new mongoose.Schema({
-  fullName: { 
-    type: String, 
-    required: true, 
-    trim: true 
+const UserSchema = new mongoose.Schema(
+  {
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      required: true,
+    },
+    age: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    membershipType: {
+      type: String,
+      required: true,
+      enum: ["Regular", "Silver", "Gold", "Platinum", "Premium", "VIP"], // As specified in UI dropdown
+    },
+    registrationDate: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true, 
-    trim: true,
-    lowercase: true 
-  },
-  phone: { 
-    type: String, 
-    required: true 
-  },
-  gender: { 
-    type: String, 
-    required: true 
-  },
-  age: { 
-    type: Number, 
-    required: true, 
-    min: 0 
-  },
-  city: { 
-    type: String, 
-    required: true 
-  },
-  username: { 
-    type: String, 
-    required: true, 
-    unique: true, 
-    trim: true 
-  },
-  membershipType: { 
-    type: String, 
-    required: true, 
-    enum: ['Regular', 'Silver', 'Gold', 'Platinum', 'Premium', 'VIP'] // As specified in UI dropdown
-  },
-  registrationDate: { 
-    type: Date, 
-    default: Date.now // Automatically sets to current date if not provided
-  }
-}, { timestamps: true });
+  { timestamps: true },
+);
 
-// booking model
+// movie schema
+
+const MovieSchema = new mongoose.Schema(
+  {
+    movieName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    language: {
+      type: String,
+      required: true,
+    },
+    genre: {
+      type: String,
+      required: true,
+    },
+    duration: {
+      type: String,
+      required: true,
+    },
+    releaseDate: {
+      type: Date,
+      required: true,
+    },
+    director: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 10,
+    },
+    showTime: {
+      type: String,
+      required: true,
+    },
+    ticketPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+  },
+  { timestamps: true },
+);
+
+// booking schema
 
 const BookingSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', // Relates directly to the User model
+    ref: 'User',
     required: true 
   },
   movieId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Movie', // Relates directly to the Movie model
+    ref: 'Movie',
     required: true 
   },
   customerName: { 
@@ -96,7 +147,7 @@ const BookingSchema = new mongoose.Schema({
     min: 1 
   },
   seatNumber: { 
-    type: String, // e.g., "A1, A2" or an Array of Strings if handling multiple seats cleanly
+    type: String, 
     required: true 
   },
   bookingAmount: { 
@@ -116,8 +167,7 @@ app.get("/health", (req, res) => {
   res.send("App is running");
 });
 
-
-//  user routes 
+//  user routes
 
 const User = mongoose.model("User", UserSchema);
 
@@ -136,7 +186,6 @@ app.post("/add-user", async (req, res) => {
   }
 });
 
-
 app.post("/view-users", async (req, res) => {
   try {
     const data = await User.find();
@@ -150,7 +199,37 @@ app.post("/view-users", async (req, res) => {
   }
 });
 
-// booking routes
+// movie routes
+
+const Movie = mongoose.model("Movie", MovieSchema);
+
+app.post("/add-movie", async (req, res) => {
+  try {
+    await Movie.create(req.body);
+
+    res.json({
+      status: "Success",
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "Error",
+      message: error.message,
+    });
+  }
+});
+
+app.post("/view-movies", async (req, res) => {
+  try {
+    const data = await Movie.find();
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({
+      status: "Error",
+      message: error.message,
+    });
+  }
+});
 
 const Booking = mongoose.model("Booking", BookingSchema);
 
