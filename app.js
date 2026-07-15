@@ -116,6 +116,100 @@ const MovieSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// booking schema
+
+const BookingSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User',
+    required: true 
+  },
+  movieId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Movie',
+    required: true 
+  },
+  customerName: { 
+    type: String, 
+    required: true 
+  },
+  showDate: { 
+    type: Date, 
+    required: true 
+  },
+  showTime: { 
+    type: String, 
+    required: true 
+  },
+  numberOfTickets: { 
+    type: Number, 
+    required: true, 
+    min: 1 
+  },
+  seatNumber: { 
+    type: String, 
+    required: true 
+  },
+  bookingAmount: { 
+    type: Number, 
+    required: true, 
+    min: 0 
+  },
+  paymentMethod: { 
+    type: String, 
+    required: true, 
+    enum: ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking', 'Wallet'] // As specified in UI dropdown
+  }
+}, { timestamps: true });
+
+// movie schema
+
+const MovieSchema = new mongoose.Schema(
+  {
+    movieName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    language: {
+      type: String,
+      required: true,
+    },
+    genre: {
+      type: String,
+      required: true,
+    },
+    duration: {
+      type: String,
+      required: true,
+    },
+    releaseDate: {
+      type: Date,
+      required: true,
+    },
+    director: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 10,
+    },
+    showTime: {
+      type: String,
+      required: true,
+    },
+    ticketPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+  },
+  { timestamps: true },
+);
+
 app.get("/health", (req, res) => {
   res.send("App is running");
 });
@@ -183,6 +277,36 @@ app.post("/view-movies", async (req, res) => {
     });
   }
 });
+
+const Booking = mongoose.model("Booking", BookingSchema);
+
+app.post("/add-booking", async (req, res) => {
+    try {
+      await Booking.create(req.body);
+  
+      res.json({
+        status: "Success",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "Error",
+        message: error.message,
+      });
+    }
+})
+
+app.post("/view-bookings", async (req, res) => {
+    try {
+      const data = await Booking.find();
+  
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({
+        status: "Error",
+        message: error.message,
+      });
+    }
+  });
 
 app.listen(3000, () => {
   console.log("Server Started on Port 3000");
