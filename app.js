@@ -120,12 +120,12 @@ const MovieSchema = new mongoose.Schema(
 
 const BookingSchema = new mongoose.Schema({
   userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
+    type: String,
     ref: 'User',
     required: true 
   },
   movieId: { 
-    type: mongoose.Schema.Types.ObjectId, 
+    type: String,
     ref: 'Movie',
     required: true 
   },
