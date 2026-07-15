@@ -162,54 +162,6 @@ const BookingSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// movie schema
-
-const MovieSchema = new mongoose.Schema(
-  {
-    movieName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    language: {
-      type: String,
-      required: true,
-    },
-    genre: {
-      type: String,
-      required: true,
-    },
-    duration: {
-      type: String,
-      required: true,
-    },
-    releaseDate: {
-      type: Date,
-      required: true,
-    },
-    director: {
-      type: String,
-      required: true,
-    },
-    rating: {
-      type: Number,
-      required: true,
-      min: 0,
-      max: 10,
-    },
-    showTime: {
-      type: String,
-      required: true,
-    },
-    ticketPrice: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-  },
-  { timestamps: true },
-);
-
 app.get("/health", (req, res) => {
   res.send("App is running");
 });
