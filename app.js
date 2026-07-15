@@ -171,7 +171,7 @@ app.post("/add-booking", async (req, res) => {
 
 app.post("/view-bookings", async (req, res) => {
     try {
-      const data = await Booking.find().populate('userId').populate('movieId');
+      const data = await Booking.find();
   
       res.json(data);
     } catch (error) {
@@ -181,7 +181,7 @@ app.post("/view-bookings", async (req, res) => {
       });
     }
   });
-  
+
 app.listen(3000, () => {
   console.log("Server Started on Port 3000");
 });
