@@ -65,6 +65,52 @@ const UserSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// booking model
+
+const BookingSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', // Relates directly to the User model
+    required: true 
+  },
+  movieId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Movie', // Relates directly to the Movie model
+    required: true 
+  },
+  customerName: { 
+    type: String, 
+    required: true 
+  },
+  showDate: { 
+    type: Date, 
+    required: true 
+  },
+  showTime: { 
+    type: String, 
+    required: true 
+  },
+  numberOfTickets: { 
+    type: Number, 
+    required: true, 
+    min: 1 
+  },
+  seatNumber: { 
+    type: String, // e.g., "A1, A2" or an Array of Strings if handling multiple seats cleanly
+    required: true 
+  },
+  bookingAmount: { 
+    type: Number, 
+    required: true, 
+    min: 0 
+  },
+  paymentMethod: { 
+    type: String, 
+    required: true, 
+    enum: ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking', 'Wallet'] // As specified in UI dropdown
+  }
+}, { timestamps: true });
+
 
 app.get("/health", (req, res) => {
   res.send("App is running");
@@ -104,6 +150,38 @@ app.post("/view-users", async (req, res) => {
   }
 });
 
+// booking routes
+
+const Booking = mongoose.model("Booking", BookingSchema);
+
+app.post("/add-booking", async (req, res) => {
+    try {
+      await Booking.create(req.body);
+  
+      res.json({
+        status: "Success",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "Error",
+        message: error.message,
+      });
+    }
+})
+
+app.post("/view-bookings", async (req, res) => {
+    try {
+      const data = await Booking.find().populate('userId').populate('movieId');
+  
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({
+        status: "Error",
+        message: error.message,
+      });
+    }
+  });
+  
 app.listen(3000, () => {
   console.log("Server Started on Port 3000");
 });
